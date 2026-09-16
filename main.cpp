@@ -22,6 +22,16 @@ private:
 
 using data_t = std::vector< unsigned long long >;
 using value_t = data_t::value_type;
+
+value_t threads_summer(const data_t& d, int l, int r) {
+  value_t s = 0;
+  for (int i = l; i < r; ++i)
+  {
+    s += d[i];
+  }
+  return s;
+}
+
 int main(int argc, char** argv) {
   int thrs = std::stoi(argv[1]);
   constexpr size_t size{1'000'000'000};
