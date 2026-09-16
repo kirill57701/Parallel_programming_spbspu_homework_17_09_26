@@ -4,17 +4,23 @@
 #include <future>
 #include <string>
 
-class Clicker {
-public:
-  Clicker() : start_(std::chrono::high_resolution_clock::now()) {}
+namespace {
 
-  double millisec() const {
+class Clicker
+{
+public:
+  Clicker():
+    start_(std::chrono::high_resolution_clock::now())
+  {}
+
+  double millisec() const
+  {
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
     using std::chrono::duration;
 
-    auto t = high_resolution_clock::now();
-    return duration_cast<duration<double, std::milli>>(t - start_).count();
+    const auto t = high_resolution_clock::now();
+    return duration_cast< duration< double, std::milli > >(t - start_).count();
   }
 
 private:
@@ -24,36 +30,40 @@ private:
 using data_t = std::vector< unsigned long long >;
 using value_t = data_t::value_type;
 
-value_t threads_summer(const data_t& d, int l, int r) {
+value_t threads_summer(const data_t &d, const int l, const int r)
+{
   value_t s = 0;
-  for (int i = l; i < r; ++i)
-  {
+  for (int i = l; i < r; ++i) {
     s += d[i];
   }
   return s;
 }
 
-int main(int argc, char** argv) {
-  int thrs = std::stoi(argv[1]);
-  constexpr size_t size{1'000'000'000};
-  double init{0}, total{0};
-  value_t sum{0};
+}
+
+int main(int argc, char **argv)
+{
+  const int thrs = std::stoi(argv[1]);
+  constexpr size_t size{ 1'000'000'000 };
+  double init{ 0 };
+  double total{ 0 };
+  value_t sum{ 0 };
   {
-    Clicker cl;
-    data_t values(size, 1);
+    const Clicker cl;
+    const data_t values(size, 1);
     init = cl.millisec();
-    std::vector<std::future<value_t>> fut;
+    std::vector< std::future< value_t > > fut;
     fut.reserve(thrs);
-    int potok_s = size/thrs;
-    int ost = size % thrs;
+    const int potok_s = size / thrs;
+    const int ost = size % thrs;
     int beg = 0;
-    for (size_t i = 0; i < thrs; ++i) {
+    for (size_t i = 0; i < static_cast< size_t >(thrs); ++i) {
       int end = beg + potok_s;
-      end += (i < ost ? 1 : 0);
+      end += (i < static_cast< size_t >(ost) ? 1 : 0);
       fut.push_back(std::async(threads_summer, std::cref(values), beg, end));
       beg = end;
     }
-    for (std::vector<std::future<value_t>>::iterator i = fut.begin(); i != fut.end(); ++i) {
+    for (std::vector< std::future< value_t > >::iterator i = fut.begin(); i != fut.end(); ++i) {
       sum += i->get();
     }
     total = cl.millisec();
