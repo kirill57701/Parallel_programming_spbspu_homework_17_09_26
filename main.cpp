@@ -2,6 +2,7 @@
 #include <chrono>
 #include <vector>
 #include <future>
+#include <string>
 
 class Clicker {
 public:
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
   double init{0}, total{0};
   value_t sum{0};
   {
-    mtt::Clicker cl;
+    Clicker cl;
     data_t values(size, 1);
     init = cl.millisec();
     std::vector<std::future<value_t>> fut;
@@ -46,9 +47,12 @@ int main(int argc, char** argv) {
     int potok_s = size/thrs;
     int ost = size % thrs;
     int beg = 0;
-    for (size_t i = 0; i < values.size(); ++i) {
-    sum += values[i];
-  }
-  total = cl.millisec();
+    for (size_t i = 0; i < thrs; ++i) {
+      int end = beg + potok_s;
+      end += (i < ost ? 1 : 0);
+      fut.push_back(std::async(threads_summer, std::cref(values), beg, end));
+      beg = end;
+    }
+    total = cl.millisec();
   }
 }
