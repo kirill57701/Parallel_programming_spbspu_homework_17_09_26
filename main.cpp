@@ -53,6 +53,11 @@ int main(int argc, char** argv) {
       fut.push_back(std::async(threads_summer, std::cref(values), beg, end));
       beg = end;
     }
+    for (std::vector<std::future<value_t>>::iterator i = fut.begin(); i != fut.end(); ++i) {
+      sum += i->get();
+    }
     total = cl.millisec();
   }
+  std::cout << total << '\n';
+  std::cout << sum << '\n';
 }
