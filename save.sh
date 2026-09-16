@@ -1,4 +1,6 @@
 #!/bin/bash
 for i in {1..5}; do
-  ./a.out 1 >> res
+  for j in 1 2 4 8 16 32 64 128 256 512 1024; do
+    ./a.out $j >> res
+  done
 done
